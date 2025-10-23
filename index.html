@@ -4,27 +4,43 @@
 <meta charset="UTF-8">
 <title>ZenMarket Redirect</title>
 <script>
-(function() {
+(async function() {
   const params = new URLSearchParams(window.location.search);
   const query = params.get('q');
 
   if (!query) {
-    // If no query, go to ZenMarket home
     window.location.href = "https://zenmarket.jp/en/";
     return;
   }
 
-  // Open ZenMarket and auto-search the query
-  const encoded = encodeURIComponent(query.trim());
-  const searchUrl = "https://zenmarket.jp/en/";
+  // Load ZenMarket in an iframe to inject search
+  const encoded = decodeURIComponent(query.trim());
+  document.write(`<iframe id="zenFrame" src="https://zenmarket.jp/en/" style="width:100%;height:100vh;border:none;"></iframe>`);
 
-  // Load ZenMarket first, then inject search after short delay
-  const form = document.createElement('form');
-  form.method = 'GET';
-  form.action = searchUrl;
-  form.innerHTML = `<input type="hidden" name="query" value="${encoded}">`;
-  document.body.appendChild(form);
-  form.submit();
+  window.addEventListener('load', () => {
+    const iframe = document.getElementById('zenFrame');
+    iframe.onload = () => {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        const searchInput = doc.querySelector('input[name="query"], input[type="search"]');
+        if (searchInput) {
+          searchInput.value = encoded;
+          const form = searchInput.closest('form');
+          if (form) {
+            form.submit();
+          } else {
+            const evt = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+            searchInput.dispatchEvent(evt);
+          }
+        } else {
+          window.location.href = `https://zenmarket.jp/en/#search=${encodeURIComponent(encoded)}`;
+        }
+      } catch (err) {
+        // If same-origin restriction, fallback
+        window.location.href = `https://zenmarket.jp/en/#search=${encodeURIComponent(encoded)}`;
+      }
+    };
+  });
 })();
 </script>
 </head>
