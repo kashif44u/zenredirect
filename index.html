@@ -4,47 +4,30 @@
 <meta charset="UTF-8">
 <title>ZenMarket Redirect</title>
 <script>
-(async function() {
+(function() {
   const params = new URLSearchParams(window.location.search);
   const query = params.get('q');
 
   if (!query) {
-    window.location.href = "https://zenmarket.jp/en/";
+    // No query → go to homepage
+    window.location.replace("https://zenmarket.jp/en/");
     return;
   }
 
-  // Load ZenMarket in an iframe to inject search
-  const encoded = decodeURIComponent(query.trim());
-  document.write(`<iframe id="zenFrame" src="https://zenmarket.jp/en/" style="width:100%;height:100vh;border:none;"></iframe>`);
+  const cleanedQuery = decodeURIComponent(query.trim());
 
-  window.addEventListener('load', () => {
-    const iframe = document.getElementById('zenFrame');
-    iframe.onload = () => {
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        const searchInput = doc.querySelector('input[name="query"], input[type="search"]');
-        if (searchInput) {
-          searchInput.value = encoded;
-          const form = searchInput.closest('form');
-          if (form) {
-            form.submit();
-          } else {
-            const evt = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
-            searchInput.dispatchEvent(evt);
-          }
-        } else {
-          window.location.href = `https://zenmarket.jp/en/#search=${encodeURIComponent(encoded)}`;
-        }
-      } catch (err) {
-        // If same-origin restriction, fallback
-        window.location.href = `https://zenmarket.jp/en/#search=${encodeURIComponent(encoded)}`;
-      }
-    };
-  });
+  // Try ZenMarket's live search format first
+  const searchUrl = `https://zenmarket.jp/en/search?q=${encodeURIComponent(cleanedQuery)}`;
+  window.location.replace(searchUrl);
+
+  // Fallback (after 3 sec) if ZenMarket changes URL structure
+  setTimeout(() => {
+    window.location.replace(`https://zenmarket.jp/en/#search=${encodeURIComponent(cleanedQuery)}`);
+  }, 3000);
 })();
 </script>
 </head>
 <body>
-Redirecting to ZenMarket...
+Redirecting to ZenMarket search...
 </body>
 </html>
