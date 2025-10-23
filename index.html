@@ -7,12 +7,12 @@
 (function() {
   const params = new URLSearchParams(window.location.search);
   const query = params.get('q');
+
   if (query) {
-    // If there’s a search term → go directly to ZenMarket search
-    const encoded = encodeURIComponent(query.trim());
-    window.location.href = "https://zenmarket.jp/en/#search=" + encoded;
+    // Open ZenMarket and auto-search
+    const encodedQuery = encodeURIComponent(query.trim());
+    window.location.href = "https://zenmarket.jp/en/?autosearch=" + encodedQuery;
   } else {
-    // If no query → just go to ZenMarket homepage
     window.location.href = "https://zenmarket.jp/en/";
   }
 })();
