@@ -5,18 +5,15 @@
 <title>ZenMarket Redirect</title>
 <script>
 (function() {
-  // Get ?q= from the URL
   const params = new URLSearchParams(window.location.search);
   const query = params.get('q');
-
   if (query) {
-    // Encode and redirect to ZenMarket search
+    // If there’s a search term → go directly to ZenMarket search
     const encoded = encodeURIComponent(query.trim());
-    // ZenMarket doesn’t allow ?q= directly, so we open the homepage and type it in
-    // Use hash (#q=...) so our script can pass it through safely
     window.location.href = "https://zenmarket.jp/en/#search=" + encoded;
   } else {
-    document.body.textContent = "No search term provided.";
+    // If no query → just go to ZenMarket homepage
+    window.location.href = "https://zenmarket.jp/en/";
   }
 })();
 </script>
@@ -25,4 +22,3 @@
 Redirecting to ZenMarket...
 </body>
 </html>
-
