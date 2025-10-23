@@ -8,13 +8,23 @@
   const params = new URLSearchParams(window.location.search);
   const query = params.get('q');
 
-  if (query) {
-    // Open ZenMarket and auto-search
-    const encodedQuery = encodeURIComponent(query.trim());
-    window.location.href = "https://zenmarket.jp/en/?autosearch=" + encodedQuery;
-  } else {
+  if (!query) {
+    // If no query, go to ZenMarket home
     window.location.href = "https://zenmarket.jp/en/";
+    return;
   }
+
+  // Open ZenMarket and auto-search the query
+  const encoded = encodeURIComponent(query.trim());
+  const searchUrl = "https://zenmarket.jp/en/";
+
+  // Load ZenMarket first, then inject search after short delay
+  const form = document.createElement('form');
+  form.method = 'GET';
+  form.action = searchUrl;
+  form.innerHTML = `<input type="hidden" name="query" value="${encoded}">`;
+  document.body.appendChild(form);
+  form.submit();
 })();
 </script>
 </head>
